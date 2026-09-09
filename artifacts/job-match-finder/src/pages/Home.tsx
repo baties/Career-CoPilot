@@ -10,7 +10,8 @@ import {
 } from '@workspace/api-client-react';
 import { SkillInput } from '../components/SkillInput';
 import { JobCard } from '../components/JobCard';
-import { Search, Loader2, Sparkles, AlertCircle, Briefcase, MapPin, GraduationCap, Laptop } from 'lucide-react';
+import { ResumeParser } from '../components/ResumeParser';
+import { Search, Loader2, Sparkles, AlertCircle, Briefcase, MapPin, GraduationCap, Laptop, UserRound } from 'lucide-react';
 import { z } from 'zod';
 import bgImage from '@assets/generated_images/job-finder-background.jpg';
 
@@ -24,6 +25,7 @@ const searchSchema = z.object({
 });
 
 export default function Home() {
+  const [candidateName, setCandidateName] = useState('');
   const [formData, setFormData] = useState<JobSearchInput>({
     title: '',
     skills: [],
@@ -104,7 +106,33 @@ export default function Home() {
           {/* Search Form */}
           <div className="glass-card rounded-[2rem] p-6 md:p-10 animate-in fade-in slide-in-from-bottom-5 delay-150">
             <form onSubmit={handleSubmit} className="space-y-8">
+              <ResumeParser
+                onParsed={({ name, skills }) => {
+                  if (name) setCandidateName(name);
+                  if (skills.length) {
+                    setFormData((current) => ({ ...current, skills: skills.slice(0, 10) }));
+                    setErrors((current) => ({ ...current, skills: '' }));
+                  }
+                }}
+              />
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Candidate Name */}
+                <div className="space-y-2.5 md:col-span-2">
+                  <label className="text-sm font-bold text-foreground/90 flex items-center gap-2">
+                    <UserRound size={18} className="text-primary" />
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Imported from your resume"
+                    className="w-full px-5 py-3.5 rounded-xl border border-border/60 bg-background/60 backdrop-blur-md text-foreground font-medium placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm hover:border-primary/30"
+                    value={candidateName}
+                    onChange={(event) => setCandidateName(event.target.value)}
+                    disabled={isSearching}
+                  />
+                  <p className="text-xs text-muted-foreground">Optional and editable. It is not sent with your job search.</p>
+                </div>
 
                 {/* Job Title */}
                 <div className="space-y-2.5">
