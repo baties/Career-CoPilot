@@ -27,7 +27,7 @@ export default function Home() {
   const [formData, setFormData] = useState<JobSearchInput>({
     title: '',
     skills: [],
-    location: '',
+    location: 'Worldwide',
     education: 'bachelors',
     workType: 'any'
   });
