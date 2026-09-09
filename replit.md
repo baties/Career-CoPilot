@@ -1,6 +1,6 @@
-# [Project name]
+# Job Match Finder
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A fast one-screen app that ranks recent job openings against a student's skills and preferences.
 
 ## Run & Operate
 
@@ -9,7 +9,7 @@ _Replace the heading above with the project's name, and this line with one sente
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- No app-specific secrets or database tables are required.
 
 ## Stack
 
@@ -22,15 +22,21 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/job-match-finder` — React frontend
+- `artifacts/api-server/src/routes/jobs.ts` — live job retrieval and match scoring
+- `lib/api-spec/openapi.yaml` — API contract
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Search uses a public recent-jobs feed and falls back to credible query-specific demo results if the source is unavailable.
+- Matching is deterministic and explainable, weighted across title, skills, location/work style, and recency.
+- No login or persistence is used, keeping the hackathon path under one minute.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Enter a target title, up to 10 skills, education, location, and work style.
+- See up to 10 job listings from the last 30 days, ranked by match score.
+- Open any result directly at its application/source page.
 
 ## User preferences
 

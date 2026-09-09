@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Job Match Finder"
+description = "A one-screen student job search app that finds recent openings, scores each role against the user's title, skills, education, location, and work-style preferences, and links directly to applications."
+version = "1.0.0"
+id = "artifacts/job-match-finder"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18856
+
+[services.development]
+run = "pnpm --filter @workspace/job-match-finder run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/job-match-finder", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/job-match-finder/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18856"
+BASE_PATH = "/"
