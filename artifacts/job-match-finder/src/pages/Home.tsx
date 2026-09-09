@@ -12,6 +12,7 @@ import { SkillInput } from '../components/SkillInput';
 import { JobCard } from '../components/JobCard';
 import { Search, Loader2, Sparkles, AlertCircle, Briefcase, MapPin, GraduationCap, Laptop } from 'lucide-react';
 import { z } from 'zod';
+import bgImage from '@assets/generated_images/job-finder-background.jpg';
 
 // Simple validation schema
 const searchSchema = z.object({
@@ -65,235 +66,246 @@ export default function Home() {
   const error = searchJobs.error;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-sans selection:bg-primary/20 selection:text-primary">
-      {/* Header / Hero */}
-      <header className="pt-16 pb-12 px-6 text-center relative overflow-hidden">
-        {/* Abstract background blobs */}
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[150%] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-[20%] right-[-10%] w-[40%] h-[120%] bg-[#06b6d4]/5 rounded-full blur-[100px] pointer-events-none" />
-        
-        <div className="relative z-10 max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-semibold text-sm mb-4 border border-primary/20 animate-in fade-in slide-in-from-bottom-2">
-            <Sparkles size={16} />
-            Career Co-Pilot
+    <div className="min-h-[100dvh] flex flex-col font-sans selection:bg-primary/20 selection:text-primary relative overflow-hidden bg-background">
+      {/* Cinematic Background Layer */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <img
+          src={bgImage}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-background/85 dark:bg-background/90 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background/95" />
+      </div>
+
+      <div className="relative z-10 flex flex-col flex-1 w-full">
+        {/* Header / Hero */}
+        <header className="pt-20 pb-14 px-6 text-center">
+          <div className="max-w-3xl mx-auto space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 dark:bg-slate-900/80 backdrop-blur-md text-primary font-semibold text-sm border border-primary/20 shadow-sm animate-in fade-in slide-in-from-bottom-2">
+              <Sparkles size={16} />
+              <span>Career Co-Pilot</span>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-foreground animate-in fade-in slide-in-from-bottom-3 drop-shadow-sm">
+              Find your next role in <br className="hidden sm:block"/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-cyan-500">
+                under 60 seconds
+              </span>
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 delay-75 font-medium leading-relaxed">
+              Skip the noise. Enter your exact skills and preferences to instantly match with top verified jobs from across the web.
+            </p>
           </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground animate-in fade-in slide-in-from-bottom-3">
-            Find your next role in <br/>
-            <span className="text-gradient">under 60 seconds</span>
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 delay-75">
-            Skip the noise. Enter your exact skills and preferences to instantly match with top verified jobs from across the web.
-          </p>
-        </div>
-      </header>
+        </header>
 
-      {/* Main Content */}
-      <main className="flex-1 w-full max-w-5xl mx-auto px-6 pb-24 relative z-10 space-y-12">
-        
-        {/* Search Form */}
-        <div className="glass-card rounded-2xl shadow-xl p-6 md:p-8 animate-in fade-in slide-in-from-bottom-5 delay-150">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              {/* Job Title */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Briefcase size={16} className="text-primary" />
-                  Target Role
-                </label>
-                <input 
-                  type="text"
-                  placeholder="e.g. Senior Frontend Engineer"
-                  className={`w-full px-4 py-2.5 rounded-lg border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow ${errors.title ? 'border-destructive ring-destructive/20' : 'border-input'}`}
-                  value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  disabled={isSearching}
-                />
-                {errors.title && <p className="text-xs text-destructive font-medium">{errors.title}</p>}
-              </div>
+        {/* Main Content */}
+        <main className="flex-1 w-full max-w-5xl mx-auto px-6 pb-24 space-y-12">
 
-              {/* Location */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <MapPin size={16} className="text-primary" />
-                  Location
-                </label>
-                <input 
-                  type="text"
-                  placeholder="e.g. San Francisco, CA or Remote"
-                  className={`w-full px-4 py-2.5 rounded-lg border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow ${errors.location ? 'border-destructive ring-destructive/20' : 'border-input'}`}
-                  value={formData.location}
-                  onChange={(e) => setFormData({...formData, location: e.target.value})}
-                  disabled={isSearching}
-                />
-                {errors.location && <p className="text-xs text-destructive font-medium">{errors.location}</p>}
-              </div>
-              
-              {/* Skills - spans full width */}
-              <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Sparkles size={16} className="text-primary" />
-                  Core Skills (1-10)
-                </label>
-                <div className={`${errors.skills ? 'ring-2 ring-destructive/20 rounded-md' : ''}`}>
-                  <SkillInput 
-                    skills={formData.skills}
-                    onChange={(skills) => {
-                      setFormData({...formData, skills});
-                      if (errors.skills && skills.length > 0) {
-                        setErrors({...errors, skills: ''});
-                      }
-                    }}
-                    maxSkills={10}
+          {/* Search Form */}
+          <div className="glass-card rounded-[2rem] p-6 md:p-10 animate-in fade-in slide-in-from-bottom-5 delay-150">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                {/* Job Title */}
+                <div className="space-y-2.5">
+                  <label className="text-sm font-bold text-foreground/90 flex items-center gap-2">
+                    <Briefcase size={18} className="text-primary" />
+                    Target Role
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Senior Frontend Engineer"
+                    className={`w-full px-5 py-3.5 rounded-xl border bg-background/60 backdrop-blur-md text-foreground font-medium placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm hover:border-primary/30 ${errors.title ? 'border-destructive ring-destructive/20' : 'border-border/60'}`}
+                    value={formData.title}
+                    onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    disabled={isSearching}
                   />
+                  {errors.title && <p className="text-sm text-destructive font-semibold">{errors.title}</p>}
                 </div>
-                {errors.skills && <p className="text-xs text-destructive font-medium">{errors.skills}</p>}
-              </div>
 
-              {/* Education */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <GraduationCap size={16} className="text-primary" />
-                  Education Level
-                </label>
-                <div className="relative">
-                  <select 
-                    className="w-full px-4 py-2.5 rounded-lg border border-input bg-card text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    value={formData.education}
-                    onChange={(e) => setFormData({...formData, education: e.target.value as any})}
+                {/* Location */}
+                <div className="space-y-2.5">
+                  <label className="text-sm font-bold text-foreground/90 flex items-center gap-2">
+                    <MapPin size={18} className="text-primary" />
+                    Location
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. San Francisco, CA or Remote"
+                    className={`w-full px-5 py-3.5 rounded-xl border bg-background/60 backdrop-blur-md text-foreground font-medium placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm hover:border-primary/30 ${errors.location ? 'border-destructive ring-destructive/20' : 'border-border/60'}`}
+                    value={formData.location}
+                    onChange={(e) => setFormData({...formData, location: e.target.value})}
                     disabled={isSearching}
-                  >
-                    <option value={JobSearchInputEducation['high-school']}>High School</option>
-                    <option value={JobSearchInputEducation.diploma}>Diploma</option>
-                    <option value={JobSearchInputEducation.bachelors}>Bachelor's Degree</option>
-                    <option value={JobSearchInputEducation.masters}>Master's Degree</option>
-                    <option value={JobSearchInputEducation.doctorate}>Doctorate</option>
-                  </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  />
+                  {errors.location && <p className="text-sm text-destructive font-semibold">{errors.location}</p>}
+                </div>
+
+                {/* Skills - spans full width */}
+                <div className="space-y-2.5 md:col-span-2">
+                  <label className="text-sm font-bold text-foreground/90 flex items-center gap-2">
+                    <Sparkles size={18} className="text-primary" />
+                    Core Skills (1-10)
+                  </label>
+                  <div className={`${errors.skills ? 'ring-2 ring-destructive/20 rounded-xl' : ''}`}>
+                    <SkillInput
+                      skills={formData.skills}
+                      onChange={(skills) => {
+                        setFormData({...formData, skills});
+                        if (errors.skills && skills.length > 0) {
+                          setErrors({...errors, skills: ''});
+                        }
+                      }}
+                      maxSkills={10}
+                    />
+                  </div>
+                  {errors.skills && <p className="text-sm text-destructive font-semibold">{errors.skills}</p>}
+                </div>
+
+                {/* Education */}
+                <div className="space-y-2.5">
+                  <label className="text-sm font-bold text-foreground/90 flex items-center gap-2">
+                    <GraduationCap size={18} className="text-primary" />
+                    Education Level
+                  </label>
+                  <div className="relative group">
+                    <select
+                      className="w-full px-5 py-3.5 rounded-xl border border-border/60 bg-background/60 backdrop-blur-md text-foreground font-medium appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm hover:border-primary/30 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      value={formData.education}
+                      onChange={(e) => setFormData({...formData, education: e.target.value as any})}
+                      disabled={isSearching}
+                    >
+                      <option value={JobSearchInputEducation['high-school']}>High School</option>
+                      <option value={JobSearchInputEducation.diploma}>Diploma</option>
+                      <option value={JobSearchInputEducation.bachelors}>Bachelor's Degree</option>
+                      <option value={JobSearchInputEducation.masters}>Master's Degree</option>
+                      <option value={JobSearchInputEducation.doctorate}>Doctorate</option>
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground group-hover:text-primary transition-colors">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Work Type */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Laptop size={16} className="text-primary" />
-                  Work Type
-                </label>
-                <div className="relative">
-                  <select 
-                    className="w-full px-4 py-2.5 rounded-lg border border-input bg-card text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    value={formData.workType}
-                    onChange={(e) => setFormData({...formData, workType: e.target.value as any})}
-                    disabled={isSearching}
-                  >
-                    <option value={JobSearchInputWorkType.any}>Any</option>
-                    <option value={JobSearchInputWorkType.remote}>Remote</option>
-                    <option value={JobSearchInputWorkType.hybrid}>Hybrid</option>
-                    <option value={JobSearchInputWorkType.onsite}>On-site</option>
-                  </select>
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                {/* Work Type */}
+                <div className="space-y-2.5">
+                  <label className="text-sm font-bold text-foreground/90 flex items-center gap-2">
+                    <Laptop size={18} className="text-primary" />
+                    Work Type
+                  </label>
+                  <div className="relative group">
+                    <select
+                      className="w-full px-5 py-3.5 rounded-xl border border-border/60 bg-background/60 backdrop-blur-md text-foreground font-medium appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm hover:border-primary/30 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      value={formData.workType}
+                      onChange={(e) => setFormData({...formData, workType: e.target.value as any})}
+                      disabled={isSearching}
+                    >
+                      <option value={JobSearchInputWorkType.any}>Any</option>
+                      <option value={JobSearchInputWorkType.remote}>Remote</option>
+                      <option value={JobSearchInputWorkType.hybrid}>Hybrid</option>
+                      <option value={JobSearchInputWorkType.onsite}>On-site</option>
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground group-hover:text-primary transition-colors">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
                   </div>
                 </div>
+
               </div>
 
-            </div>
-
-            <div className="pt-4 flex justify-end border-t border-border">
-              <button 
-                type="submit" 
-                disabled={isSearching}
-                className="w-full md:w-auto px-8 py-3.5 bg-primary text-primary-foreground font-bold rounded-lg shadow-lg hover:bg-primary/90 hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:hover:translate-y-0 transition-all flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card"
-              >
-                {isSearching ? (
-                  <>
-                    <Loader2 size={20} className="animate-spin" />
-                    Finding Matches...
-                  </>
-                ) : (
-                  <>
-                    <Search size={20} />
-                    Search Jobs
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Loading State */}
-        {isSearching && (
-          <div className="space-y-6 pt-8 animate-in fade-in">
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground space-y-4">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full blur-xl bg-primary/20 animate-pulse" />
-                <Search size={48} className="text-primary animate-bounce relative z-10" />
+              <div className="pt-6 flex justify-end border-t border-border/50">
+                <button
+                  type="submit"
+                  disabled={isSearching}
+                  className="w-full md:w-auto px-10 py-4 bg-primary text-primary-foreground font-bold text-lg rounded-xl shadow-[0_8px_30px_-10px_rgba(37,99,235,0.6)] hover:shadow-[0_12px_40px_-12px_rgba(37,99,235,0.8)] hover:bg-primary/95 hover:-translate-y-1 active:translate-y-0 disabled:opacity-70 disabled:hover:translate-y-0 disabled:shadow-none transition-all duration-300 flex items-center justify-center gap-3 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+                >
+                  {isSearching ? (
+                    <>
+                      <Loader2 size={22} className="animate-spin" />
+                      Finding Matches...
+                    </>
+                  ) : (
+                    <>
+                      <Search size={22} />
+                      Search Jobs
+                    </>
+                  )}
+                </button>
               </div>
-              <p className="text-lg font-medium text-foreground">Scanning thousands of active listings...</p>
-              <div className="w-48 h-1.5 bg-secondary rounded-full overflow-hidden">
-                <div className="h-full bg-primary rounded-full w-1/2 animate-[pulse_1s_ease-in-out_infinite] origin-left" style={{ animation: 'progress 2s infinite linear' }} />
-              </div>
-            </div>
+            </form>
           </div>
-        )}
 
-        {/* Error State */}
-        {error && !isSearching && (
-          <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-6 flex items-start gap-4 animate-in fade-in slide-in-from-bottom-2">
-            <AlertCircle className="text-destructive shrink-0 mt-0.5" size={24} />
-            <div>
-              <h3 className="text-lg font-bold text-destructive">Search Failed</h3>
-              <p className="text-destructive/80 mt-1">
-                We couldn't complete your search. Please check your connection and try again.
-              </p>
+          {/* Loading State */}
+          {isSearching && (
+            <div className="space-y-6 pt-12 pb-16 animate-in fade-in">
+              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground space-y-6">
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full blur-2xl bg-primary/30 animate-pulse" />
+                  <Search size={56} className="text-primary animate-bounce relative z-10" />
+                </div>
+                <p className="text-xl font-bold text-foreground drop-shadow-sm">Scanning thousands of active listings...</p>
+                <div className="w-64 h-2 bg-secondary rounded-full overflow-hidden shadow-inner">
+                  <div className="h-full bg-primary rounded-full w-1/2 animate-[progress_1.5s_ease-in-out_infinite] origin-left" style={{ animation: 'progress 2s infinite linear' }} />
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Results */}
-        {results && !isSearching && (
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
-            <div className="flex items-center justify-between border-b border-border pb-4">
+          {/* Error State */}
+          {error && !isSearching && (
+            <div className="bg-destructive/10 border-2 border-destructive/20 backdrop-blur-md rounded-2xl p-6 flex items-start gap-4 animate-in fade-in slide-in-from-bottom-2 shadow-sm">
+              <AlertCircle className="text-destructive shrink-0 mt-1" size={24} />
               <div>
-                <h2 className="text-2xl font-bold text-foreground">
-                  Top Matches
-                </h2>
-                <p className="text-muted-foreground mt-1">
-                  Found {results.jobs.length} roles from {results.totalScanned.toLocaleString()} scanned listings.
+                <h3 className="text-lg font-bold text-destructive">Search Failed</h3>
+                <p className="text-destructive/80 mt-1 font-medium">
+                  We couldn't complete your search. Please check your connection and try again.
                 </p>
               </div>
-              {results.live && (
-                <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-bold uppercase tracking-wide border border-green-200">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  Live Search
+            </div>
+          )}
+
+          {/* Results */}
+          {results && !isSearching && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+              <div className="flex items-center justify-between border-b border-border/50 pb-6">
+                <div>
+                  <h2 className="text-3xl font-extrabold text-foreground drop-shadow-sm">
+                    Top Matches
+                  </h2>
+                  <p className="text-muted-foreground mt-2 font-medium text-lg">
+                    Found <span className="text-foreground font-bold">{results.jobs.length}</span> roles from <span className="text-foreground font-bold">{results.totalScanned.toLocaleString()}</span> scanned listings.
+                  </p>
+                </div>
+                {results.live && (
+                  <div className="hidden md:flex items-center gap-2.5 px-4 py-1.5 bg-green-500/10 text-green-700 dark:text-green-400 rounded-full text-xs font-bold uppercase tracking-widest border border-green-500/20 shadow-sm backdrop-blur-md">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    Live Search
+                  </div>
+                )}
+              </div>
+
+              {results.jobs.length > 0 ? (
+                <div className="space-y-5">
+                  {results.jobs.map((job, idx) => (
+                    <div key={job.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-in fade-in slide-in-from-bottom-4 fill-mode-both">
+                      <JobCard job={job} searchedSkills={formData.skills} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-32 bg-background/50 backdrop-blur-md rounded-[2rem] border border-border/60 shadow-sm">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-secondary mb-6 shadow-inner">
+                    <Search size={32} className="text-muted-foreground" />
+                  </div>
+                  <h3 className="text-2xl font-extrabold text-foreground mb-3">No perfect matches found</h3>
+                  <p className="text-muted-foreground text-lg max-w-md mx-auto font-medium">
+                    We couldn't find any roles matching all your criteria right now. Try broadening your location, removing a few niche skills, or selecting "Any" work type.
+                  </p>
                 </div>
               )}
             </div>
-
-            {results.jobs.length > 0 ? (
-              <div className="space-y-4">
-                {results.jobs.map((job, idx) => (
-                  <div key={job.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-in fade-in slide-in-from-bottom-4 fill-mode-both">
-                    <JobCard job={job} searchedSkills={formData.skills} />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-24 bg-card rounded-2xl border border-border shadow-sm">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-secondary mb-4">
-                  <Search size={24} className="text-muted-foreground" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">No perfect matches found</h3>
-                <p className="text-muted-foreground max-w-md mx-auto">
-                  We couldn't find any roles matching all your criteria right now. Try broadening your location, removing a few niche skills, or selecting "Any" work type.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-      </main>
+          )}
+        </main>
+      </div>
 
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes progress {

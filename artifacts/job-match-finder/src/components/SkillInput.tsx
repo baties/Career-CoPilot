@@ -43,13 +43,13 @@ export function SkillInput({ skills, onChange, maxSkills = 10 }: SkillInputProps
 
   return (
     <div 
-      className="flex flex-wrap items-center gap-2 p-2 min-h-[46px] w-full rounded-md border border-input bg-card shadow-sm transition-colors focus-within:ring-2 focus-within:ring-ring focus-within:border-transparent cursor-text"
+      className="flex flex-wrap items-center gap-2.5 p-3 min-h-[60px] w-full rounded-xl border border-border/60 bg-background/60 backdrop-blur-md shadow-sm transition-all focus-within:ring-2 focus-within:ring-primary/50 focus-within:border-primary cursor-text hover:border-primary/30"
       onClick={() => inputRef.current?.focus()}
     >
       {skills.map((skill, index) => (
         <span 
           key={index}
-          className="flex items-center gap-1 bg-secondary text-secondary-foreground text-sm px-2.5 py-1 rounded-full font-medium"
+          className="flex items-center gap-1.5 bg-foreground text-background text-sm px-3.5 py-1.5 rounded-lg font-bold shadow-sm"
         >
           {skill}
           <button
@@ -58,10 +58,10 @@ export function SkillInput({ skills, onChange, maxSkills = 10 }: SkillInputProps
               e.stopPropagation();
               removeSkill(index);
             }}
-            className="text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+            className="text-background/70 hover:text-background transition-colors focus:outline-none"
             aria-label={`Remove ${skill}`}
           >
-            <X size={14} />
+            <X size={14} strokeWidth={3} />
           </button>
         </span>
       ))}
@@ -73,7 +73,7 @@ export function SkillInput({ skills, onChange, maxSkills = 10 }: SkillInputProps
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleBlur}
-          className="flex-1 bg-transparent min-w-[120px] outline-none text-sm placeholder:text-muted-foreground"
+          className="flex-1 bg-transparent min-w-[150px] outline-none text-base font-medium text-foreground placeholder:text-muted-foreground/70"
           placeholder={skills.length === 0 ? "e.g. React, TypeScript, Node.js..." : "Add another skill..."}
         />
       )}
