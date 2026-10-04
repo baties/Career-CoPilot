@@ -9,6 +9,36 @@ import * as zod from 'zod';
 
 
 /**
+ * Sends the URL to People Data Labs. Requires explicit consent; successful matches may consume provider credits.
+ * @summary Import available name and skills from a LinkedIn profile URL
+ */
+export const importLinkedInProfileBodyUrlMax = 500;
+
+
+
+export const ImportLinkedInProfileBody = zod.object({
+  "url": zod.string().min(1).max(importLinkedInProfileBodyUrlMax),
+  "consent": zod.boolean().describe('Must be true to authorize sending this URL to the profile-data provider.')
+})
+
+export const importLinkedInProfileResponseNameMax = 100;
+
+export const importLinkedInProfileResponseSkillsItemMax = 50;
+
+export const importLinkedInProfileResponseSkillsMax = 1000;
+
+export const importLinkedInProfileResponseDetectedSkillCountMin = 0;
+
+
+
+export const ImportLinkedInProfileResponse = zod.object({
+  "name": zod.string().max(importLinkedInProfileResponseNameMax),
+  "skills": zod.array(zod.string().min(1).max(importLinkedInProfileResponseSkillsItemMax)).max(importLinkedInProfileResponseSkillsMax),
+  "detectedSkillCount": zod.number().int().min(importLinkedInProfileResponseDetectedSkillCountMin)
+})
+
+
+/**
  * Returns server health status
  * @summary Health check
  */

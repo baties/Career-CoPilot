@@ -13,6 +13,37 @@ tags:
   - name: jobs
     description: Recent job matching
 paths:
+  /profiles/linkedin:
+    post:
+      operationId: importLinkedInProfile
+      tags: [profiles]
+      summary: Import available name and skills from a LinkedIn profile URL
+      description: Sends the URL to People Data Labs. Requires explicit consent; successful matches may consume provider credits.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LinkedInProfileInput"
+      responses:
+        "200":
+          description: Available profile fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LinkedInProfile"
+        "400":
+          description: Invalid URL or missing consent
+        "404":
+          description: No matching profile
+        "422":
+          description: No importable name or skills
+        "429":
+          description: Lookup limit reached
+        "502":
+          description: Provider unavailable or account requires attention
+        "504":
+          description: Provider lookup timed out
   /healthz:
     get:
       operationId: healthCheck
@@ -47,6 +78,34 @@ paths:
                 $ref: "#/components/schemas/JobSearchResponse"
 components:
   schemas:
+    LinkedInProfileInput:
+      type: object
+      required: [url, consent]
+      properties:
+        url:
+          type: string
+          minLength: 1
+          maxLength: 500
+        consent:
+          type: boolean
+          description: Must be true to authorize sending this URL to the profile-data provider.
+    LinkedInProfile:
+      type: object
+      required: [name, skills, detectedSkillCount]
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        skills:
+          type: array
+          maxItems: 1000
+          items:
+            type: string
+            minLength: 1
+            maxLength: 50
+        detectedSkillCount:
+          type: integer
+          minimum: 0
     HealthStatus:
       type: object
       properties:

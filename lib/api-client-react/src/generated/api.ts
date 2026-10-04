@@ -22,7 +22,9 @@ import type {
 import type {
   HealthStatus,
   JobSearchInput,
-  JobSearchResponse
+  JobSearchResponse,
+  LinkedInProfile,
+  LinkedInProfileInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -51,6 +53,78 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getImportLinkedInProfileUrl = () => {
+
+
+
+
+  return `/api/profiles/linkedin`
+}
+
+/**
+ * Sends the URL to People Data Labs. Requires explicit consent; successful matches may consume provider credits.
+ * @summary Import available name and skills from a LinkedIn profile URL
+ */
+export const importLinkedInProfile = async (linkedInProfileInput: LinkedInProfileInput, options?: Parameters<typeof customFetch>[1]): Promise<LinkedInProfile> => {
+
+  return customFetch<LinkedInProfile>(getImportLinkedInProfileUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(linkedInProfileInput)
+  }
+);}
+
+
+
+
+
+export const getImportLinkedInProfileMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importLinkedInProfile>>, TError,{data: BodyType<LinkedInProfileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof importLinkedInProfile>>, TError,{data: BodyType<LinkedInProfileInput>}, TContext> => {
+
+const mutationKey = ['importLinkedInProfile'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof importLinkedInProfile>>, {data: BodyType<LinkedInProfileInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  importLinkedInProfile(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ImportLinkedInProfileMutationResult = NonNullable<Awaited<ReturnType<typeof importLinkedInProfile>>>
+    export type ImportLinkedInProfileMutationBody = BodyType<LinkedInProfileInput>
+    export type ImportLinkedInProfileMutationError = ErrorType<void>
+
+    /**
+ * @summary Import available name and skills from a LinkedIn profile URL
+ */
+export const useImportLinkedInProfile = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importLinkedInProfile>>, TError,{data: BodyType<LinkedInProfileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof importLinkedInProfile>>,
+        TError,
+        {data: BodyType<LinkedInProfileInput>},
+        TContext
+      > => {
+      return useMutation(getImportLinkedInProfileMutationOptions(options));
+    }
 
 export const getHealthCheckUrl = () => {
 

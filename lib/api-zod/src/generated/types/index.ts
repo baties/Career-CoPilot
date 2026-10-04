@@ -13,6 +13,8 @@ export * from './jobSearchInput';
 export * from './jobSearchInputEducation';
 export * from './jobSearchInputWorkType';
 export * from './jobSearchResponse';
+export * from './linkedInProfile';
+export * from './linkedInProfileInput';
 export * from './locationPreference';
 export * from './skillProficiency';
 export * from './skillProficiencyLevel';

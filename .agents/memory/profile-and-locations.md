@@ -4,8 +4,12 @@ description: User requirements and agreed constraints for dashboard profile impo
 ---
 
 The user wants both LinkedIn URL import and PDF/pasted-content import, not one instead of the other.
-**Why:** The user explicitly said “Both should be possible” when asked to select a LinkedIn import method. The provider connection was dismissed, not an explicit rejection of URL-import functionality.
-**How to apply:** Treat URL import as blocked until the provider is connected, never as a working feature or permanently dropped requirement. Do not fake URL imports or infer skills from a profile slug.
+**Why:** The user explicitly said “Both should be possible” when asked to select a LinkedIn import method, and later connected People Data Labs to enable URL lookups.
+**How to apply:** Preserve all import methods. URL import depends on provider coverage and credits; missing or empty records must fail explicitly. Do not fake URL imports or infer skills from a profile slug.
+
+Keep URL enrichment minimal and avoid automatic retries of paid lookups. A timed-out lookup may still consume a provider credit.
+**Why:** URL imports introduce usage charges into an otherwise anonymous, browser-local import flow. The connectors SDK currently has no AbortSignal option, so a browser timeout does not cancel the provider call.
+**How to apply:** Obtain agreement before sending the URL, request only name/skills, do not log or cache profile data, and retain the concurrency slot until the provider call actually settles. In-process limits are not a provider-wide spending cap.
 
 The user wants simultaneous country/city preferences, such as UAE — Dubai; Canada — Toronto and Calgary; UK — All cities.
 **Why:** These are alternative job destinations, not a requirement that one job be in all of them.

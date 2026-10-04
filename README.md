@@ -9,7 +9,7 @@ Job Match Finder helps students quickly discover recent job openings that match 
 3. Add between 1 and 10 skills in **Core Skills**.
    - Type a skill and press **Enter** or type a comma.
    - Example: `React`, `TypeScript`, `CSS`.
-   - Optionally import from a resume PDF, LinkedIn-exported PDF (up to 10 MB), or pasted LinkedIn profile text.
+   - Optionally import from a resume PDF, LinkedIn-exported PDF (up to 10 MB), pasted LinkedIn profile text, or a LinkedIn member profile URL.
    - Imports merge up to 10 skills without replacing your existing skills or levels. Review the detected name and skills; extraction may be incomplete.
    - Choose **Beginner**, **Intermediate**, **Advanced**, or **Expert** for each skill. Imported skills start at Beginner for you to review. These self-assessments do not change match scoring.
    - Delete skills with their remove buttons and add replacements.
@@ -42,7 +42,9 @@ Each result includes:
 
 Location and work type are strict filters. For example, selecting `Canada, Calgary` and `Remote` excludes jobs outside Calgary and jobs marked Hybrid or On-site.
 
-LinkedIn URL-only import is not enabled because no profile data provider is connected. Use the PDF or pasted-text options instead. URL imports would require a provider account, may incur lookup charges, and depend on available profile coverage.
+For URL import, select **LinkedIn URL**, enter your `https://www.linkedin.com/in/...` address and agree to the provider lookup. The server uses the connected People Data Labs integration to retrieve only available name and skills. Successful matches can consume provider credits. Coverage can be incomplete or outdated; missing profiles, empty records, credit limits and provider failures are reported explicitly. PDF and pasted-text imports remain available without provider lookups.
+
+To limit anonymous lookup costs, the server allows five attempts per network address per hour, 30 attempts per day, and two simultaneous provider calls, per running server process. These in-memory limits reset on restart and are not an account-wide billing cap across multiple instances. Set provider-side spending limits for a firm account-wide budget. No automatic app retries or profile caching are used. A timed-out lookup may still consume a credit if the provider eventually matches it.
 
 ## Tips for better matches
 
@@ -67,6 +69,7 @@ Try one or more of the following:
 - No account is required.
 - The app does not save searches in a database.
 - Resume PDFs and pasted profile text are parsed locally in the browser and are not uploaded or saved. The editable name is not sent in job searches.
+- LinkedIn URL imports send the profile URL to People Data Labs via the server only after agreement. The app does not log the URL or returned profile, or save them in a database; only available name and skills are returned to the browser.
 - Search details are used only to retrieve, filter, and rank the current results.
 - If the public job provider is temporarily unavailable, the app may show clearly labeled demo search results so the experience can still be demonstrated.
 

@@ -5,6 +5,29 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export interface LinkedInProfileInput {
+  /**
+     * @minLength 1
+     * @maxLength 500
+     */
+  url: string;
+  /** Must be true to authorize sending this URL to the profile-data provider. */
+  consent: boolean;
+}
+
+export interface LinkedInProfile {
+  /** @maxLength 100 */
+  name: string;
+  /**
+     * @maxItems 1000
+     * @items.minLength 1
+     * @items.maxLength 50
+     */
+  skills: string[];
+  /** @minimum 0 */
+  detectedSkillCount: number;
+}
+
 export interface HealthStatus {
   status: string;
 }
