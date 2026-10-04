@@ -9,9 +9,15 @@ Job Match Finder helps students quickly discover recent job openings that match 
 3. Add between 1 and 10 skills in **Core Skills**.
    - Type a skill and press **Enter** or type a comma.
    - Example: `React`, `TypeScript`, `CSS`.
-4. Enter your preferred **Location**.
-   - For a specific city, include the country and city, such as `Canada, Calgary`.
-   - Enter `Worldwide` when you do not want to restrict results to one location.
+   - Optionally import from a resume PDF, LinkedIn-exported PDF (up to 10 MB), or pasted LinkedIn profile text.
+   - Imports merge up to 10 skills without replacing your existing skills or levels. Review the detected name and skills; extraction may be incomplete.
+   - Choose **Beginner**, **Intermediate**, **Advanced**, or **Expert** for each skill. Imported skills start at Beginner for you to review. These self-assessments do not change match scoring.
+   - Delete skills with their remove buttons and add replacements.
+4. Select your preferred **Job Locations**.
+   - `Worldwide` is selected initially and can be cleared.
+   - Search for and add multiple countries. Within each country, choose **All cities**, multiple major cities, or add custom cities.
+   - Example: UAE — Dubai; Canada — Toronto and Calgary; UK — All cities.
+   - Results may match any selected destination. Choose at least one destination or explicitly select Worldwide.
 5. Select your **Education Level**.
 6. Select a **Work Type**:
    - **Remote**
@@ -36,6 +42,8 @@ Each result includes:
 
 Location and work type are strict filters. For example, selecting `Canada, Calgary` and `Remote` excludes jobs outside Calgary and jobs marked Hybrid or On-site.
 
+LinkedIn URL-only import is not enabled because no profile data provider is connected. Use the PDF or pasted-text options instead. URL imports would require a provider account, may incur lookup charges, and depend on available profile coverage.
+
 ## Tips for better matches
 
 - Use a clear, common job title.
@@ -58,6 +66,7 @@ Try one or more of the following:
 
 - No account is required.
 - The app does not save searches in a database.
+- Resume PDFs and pasted profile text are parsed locally in the browser and are not uploaded or saved. The editable name is not sent in job searches.
 - Search details are used only to retrieve, filter, and rank the current results.
 - If the public job provider is temporarily unavailable, the app may show clearly labeled demo search results so the experience can still be demonstrated.
 

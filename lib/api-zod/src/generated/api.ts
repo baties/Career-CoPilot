@@ -31,6 +31,20 @@ export const searchJobsBodySkillsMax = 10;
 export const searchJobsBodyLocationMin = 2;
 export const searchJobsBodyLocationMax = 100;
 
+export const searchJobsBodyLocationsItemCountryMin = 2;
+export const searchJobsBodyLocationsItemCountryMax = 100;
+
+export const searchJobsBodyLocationsItemCitiesItemMin = 2;
+export const searchJobsBodyLocationsItemCitiesItemMax = 100;
+
+export const searchJobsBodyLocationsItemCitiesMax = 30;
+
+export const searchJobsBodyLocationsMax = 30;
+
+export const searchJobsBodySkillLevelsItemSkillMax = 50;
+
+export const searchJobsBodySkillLevelsMax = 10;
+
 
 
 export const SearchJobsBody = zod.object({
@@ -38,6 +52,14 @@ export const SearchJobsBody = zod.object({
   "skills": zod.array(zod.string().min(1).max(searchJobsBodySkillsItemMax)).min(1).max(searchJobsBodySkillsMax),
   "education": zod.enum(['high-school', 'diploma', 'bachelors', 'masters', 'doctorate']),
   "location": zod.string().min(searchJobsBodyLocationMin).max(searchJobsBodyLocationMax),
+  "locations": zod.array(zod.object({
+  "country": zod.string().min(searchJobsBodyLocationsItemCountryMin).max(searchJobsBodyLocationsItemCountryMax),
+  "cities": zod.array(zod.string().min(searchJobsBodyLocationsItemCitiesItemMin).max(searchJobsBodyLocationsItemCitiesItemMax)).max(searchJobsBodyLocationsItemCitiesMax)
+})).min(1).max(searchJobsBodyLocationsMax).optional().describe('Alternative accepted locations. Empty cities means all cities in the country. Omit for legacy single-location searches.'),
+  "skillLevels": zod.array(zod.object({
+  "skill": zod.string().min(1).max(searchJobsBodySkillLevelsItemSkillMax),
+  "level": zod.enum(['beginner', 'intermediate', 'advanced', 'expert'])
+})).max(searchJobsBodySkillLevelsMax).optional().describe('User self-assessed proficiency. Does not change the existing skills match scoring.'),
   "workType": zod.enum(['remote', 'hybrid', 'onsite', 'any'])
 })
 

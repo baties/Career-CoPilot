@@ -1,5 +1,6 @@
 import { Router, type IRouter } from "express";
 import { SearchJobsBody, SearchJobsResponse } from "@workspace/api-zod";
+import { demoLocation, matchesLocationPreferences } from "../lib/locationMatching";
 
 const router: IRouter = Router();
 
@@ -119,6 +120,10 @@ router.post("/jobs/search", async (req, res): Promise<void> => {
   }
 
   const input = parsed.data;
+  const locationMatches = (location: string) =>
+    input.locations?.length
+      ? matchesLocationPreferences(location, input.locations)
+      : matchesRequestedLocation(location, input.location);
   let sourceJobs: RemoteJob[] = [];
   let live = false;
 
@@ -152,7 +157,9 @@ router.post("/jobs/search", async (req, res): Promise<void> => {
           : `${["Junior", "Associate", "Graduate"][index % 3]} ${input.title}`,
       company,
       location:
-        input.location.toLowerCase() === "worldwide"
+        input.locations?.length
+          ? demoLocation(input.locations, index)
+          : input.location.toLowerCase() === "worldwide"
           ? "Worldwide"
           : input.location,
       tags: [...input.skills.slice(0, 4), "Communication", "Teamwork"],
@@ -178,7 +185,7 @@ router.post("/jobs/search", async (req, res): Promise<void> => {
   const parsedJobs = sourceJobs
     .map(parseJob)
     .filter((job) =>
-      matchesRequestedLocation(job.parsedLocation, input.location),
+      locationMatches(job.parsedLocation),
     )
     .filter(
       (job) =>
@@ -200,7 +207,7 @@ router.post("/jobs/search", async (req, res): Promise<void> => {
         tokenize(skill).some((term) => text.includes(term)),
       );
       const location = job.parsedLocation;
-      const locationMatch = matchesRequestedLocation(location, input.location);
+      const locationMatch = locationMatches(location);
       const score = Math.min(
         99,
         Math.max(

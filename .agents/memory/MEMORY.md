@@ -1,0 +1,1 @@
+- [Profile and location preferences](profile-and-locations.md) — multiple destinations, editable skill levels, and both LinkedIn import methods are required.

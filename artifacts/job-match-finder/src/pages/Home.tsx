@@ -8,7 +8,8 @@ import {
   JobSearchInputEducation, 
   JobSearchInputWorkType 
 } from '@workspace/api-client-react';
-import { SkillInput } from '../components/SkillInput';
+import { SkillInput, type SkillLevels } from '../components/SkillInput';
+import { LocationPicker, type LocationSelection } from '../components/LocationPicker';
 import { JobCard } from '../components/JobCard';
 import { ResumeParser } from '../components/ResumeParser';
 import { Search, Loader2, Sparkles, AlertCircle, Briefcase, MapPin, GraduationCap, Laptop, UserRound } from 'lucide-react';
@@ -19,7 +20,6 @@ import bgImage from '@assets/generated_images/job-finder-background.jpg';
 const searchSchema = z.object({
   title: z.string().min(2, "Job title must be at least 2 characters").max(100),
   skills: z.array(z.string()).min(1, "Add at least one skill").max(10, "Maximum 10 skills allowed"),
-  location: z.string().min(2, "Location must be at least 2 characters").max(100),
   education: z.enum(['high-school', 'diploma', 'bachelors', 'masters', 'doctorate']),
   workType: z.enum(['remote', 'hybrid', 'onsite', 'any']),
 });
@@ -33,18 +33,23 @@ export default function Home() {
     education: 'bachelors',
     workType: 'any'
   });
+  const [skillLevels, setSkillLevels] = useState<SkillLevels>({});
+  const [worldwide, setWorldwide] = useState(true);
+  const [selections, setSelections] = useState<LocationSelection[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   const searchJobs = useSearchJobs();
 
   const validateForm = () => {
+    const locError = !worldwide && selections.length === 0 ? 'Choose at least one country, or select Worldwide.' : '';
     try {
       searchSchema.parse(formData);
-      setErrors({});
-      return true;
+      setErrors(locError ? { location: locError } : {});
+      return !locError;
     } catch (err) {
       if (err instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
+        if (locError) newErrors.location = locError;
         err.errors.forEach(e => {
           if (e.path[0]) {
             newErrors[e.path[0].toString()] = e.message;
@@ -60,7 +65,22 @@ export default function Home() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    searchJobs.mutate({ data: formData });
+    const summary = worldwide
+      ? 'Worldwide'
+      : selections
+          .map((l) => `${l.country}: ${l.cities.length ? l.cities.join(', ') : 'All cities'}`)
+          .join('; ')
+          .slice(0, 100);
+    searchJobs.mutate({
+      data: {
+        ...formData,
+        location: summary,
+        ...(worldwide
+          ? {}
+          : { locations: selections.map((l) => ({ country: l.country, cities: l.cities })) }),
+        skillLevels: formData.skills.map((skill) => ({ skill, level: skillLevels[skill] ?? 'beginner' })),
+      },
+    });
   };
 
   const isSearching = searchJobs.isPending;
@@ -107,23 +127,48 @@ export default function Home() {
           <div className="glass-card rounded-[2rem] p-6 md:p-10 animate-in fade-in slide-in-from-bottom-5 delay-150">
             <form onSubmit={handleSubmit} className="space-y-8">
               <ResumeParser
-                onParsed={({ name, skills }) => {
-                  if (name) setCandidateName(name);
-                  if (skills.length) {
-                    setFormData((current) => ({ ...current, skills: skills.slice(0, 10) }));
-                    setErrors((current) => ({ ...current, skills: '' }));
+                disabled={isSearching}
+                onImport={({ name, skills }) => {
+                  const current = formData.skills;
+                  const seen = new Set(current.map((k) => k.toLowerCase()));
+                  const fresh: string[] = [];
+                  let duplicates = 0;
+                  for (const raw of skills) {
+                    const k = raw.trim().slice(0, 50);
+                    if (!k) continue;
+                    if (seen.has(k.toLowerCase())) {
+                      duplicates += 1;
+                      continue;
+                    }
+                    seen.add(k.toLowerCase());
+                    fresh.push(k);
                   }
+                  const room = Math.max(0, 10 - current.length);
+                  const added = fresh.slice(0, room);
+                  const nameSet = !!name && !candidateName.trim();
+                  if (nameSet) setCandidateName(name);
+                  if (added.length) {
+                    setFormData((c) => ({ ...c, skills: [...c.skills, ...added] }));
+                    setSkillLevels((c) => {
+                      const next = { ...c };
+                      added.forEach((k) => { next[k] = 'beginner'; });
+                      return next;
+                    });
+                    setErrors((c) => ({ ...c, skills: '' }));
+                  }
+                  return { added: added.length, duplicates, overLimit: fresh.length - added.length, nameSet };
                 }}
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Candidate Name */}
                 <div className="space-y-2.5 md:col-span-2">
-                  <label className="text-sm font-bold text-foreground/90 flex items-center gap-2">
+                  <label htmlFor="candidate-name" className="text-sm font-bold text-foreground/90 flex items-center gap-2">
                     <UserRound size={18} className="text-primary" />
                     Your Name
                   </label>
                   <input
+                    id="candidate-name"
                     type="text"
                     placeholder="Imported from your resume"
                     className="w-full px-5 py-3.5 rounded-xl border border-border/60 bg-background/60 backdrop-blur-md text-foreground font-medium placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm hover:border-primary/30"
@@ -152,20 +197,23 @@ export default function Home() {
                 </div>
 
                 {/* Location */}
-                <div className="space-y-2.5">
-                  <label className="text-sm font-bold text-foreground/90 flex items-center gap-2">
+                <div className="space-y-2.5 md:col-span-2">
+                  <span className="text-sm font-bold text-foreground/90 flex items-center gap-2">
                     <MapPin size={18} className="text-primary" />
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. San Francisco, CA or Remote"
-                    className={`w-full px-5 py-3.5 rounded-xl border bg-background/60 backdrop-blur-md text-foreground font-medium placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm hover:border-primary/30 ${errors.location ? 'border-destructive ring-destructive/20' : 'border-border/60'}`}
-                    value={formData.location}
-                    onChange={(e) => setFormData({...formData, location: e.target.value})}
+                    Job Locations
+                  </span>
+                  <LocationPicker
+                    worldwide={worldwide}
+                    selections={selections}
                     disabled={isSearching}
+                    error={errors.location}
+                    onChange={(v) => {
+                      setWorldwide(v.worldwide);
+                      setSelections(v.selections);
+                      if (errors.location) setErrors((c) => ({ ...c, location: '' }));
+                    }}
                   />
-                  {errors.location && <p className="text-sm text-destructive font-semibold">{errors.location}</p>}
+                  {errors.location && <p className="text-sm text-destructive font-semibold" role="alert">{errors.location}</p>}
                 </div>
 
                 {/* Skills - spans full width */}
@@ -177,11 +225,12 @@ export default function Home() {
                   <div className={`${errors.skills ? 'ring-2 ring-destructive/20 rounded-xl' : ''}`}>
                     <SkillInput
                       skills={formData.skills}
-                      onChange={(skills) => {
-                        setFormData({...formData, skills});
-                        if (errors.skills && skills.length > 0) {
-                          setErrors({...errors, skills: ''});
-                        }
+                      levels={skillLevels}
+                      disabled={isSearching}
+                      onChange={(skills, levels) => {
+                        setFormData((c) => ({ ...c, skills }));
+                        setSkillLevels(levels);
+                        if (errors.skills && skills.length > 0) setErrors((c) => ({ ...c, skills: '' }));
                       }}
                       maxSkills={10}
                     />

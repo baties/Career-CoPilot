@@ -7,6 +7,8 @@
  */
 import type { JobSearchInputEducation } from './jobSearchInputEducation';
 import type { JobSearchInputWorkType } from './jobSearchInputWorkType';
+import type { LocationPreference } from './locationPreference';
+import type { SkillProficiency } from './skillProficiency';
 
 export interface JobSearchInput {
   /**
@@ -27,5 +29,16 @@ export interface JobSearchInput {
      * @maxLength 100
      */
   location: string;
+  /**
+     * Alternative accepted locations. Empty cities means all cities in the country. Omit for legacy single-location searches.
+     * @minItems 1
+     * @maxItems 30
+     */
+  locations?: LocationPreference[];
+  /**
+     * User self-assessed proficiency. Does not change the existing skills match scoring.
+     * @maxItems 10
+     */
+  skillLevels?: SkillProficiency[];
   workType: JobSearchInputWorkType;
 }

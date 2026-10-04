@@ -30,6 +30,39 @@ export const JobSearchInputWorkType = {
   any: 'any',
 } as const;
 
+export interface LocationPreference {
+  /**
+     * @minLength 2
+     * @maxLength 100
+     */
+  country: string;
+  /**
+     * @maxItems 30
+     * @items.minLength 2
+     * @items.maxLength 100
+     */
+  cities: string[];
+}
+
+export type SkillProficiencyLevel = typeof SkillProficiencyLevel[keyof typeof SkillProficiencyLevel];
+
+
+export const SkillProficiencyLevel = {
+  beginner: 'beginner',
+  intermediate: 'intermediate',
+  advanced: 'advanced',
+  expert: 'expert',
+} as const;
+
+export interface SkillProficiency {
+  /**
+     * @minLength 1
+     * @maxLength 50
+     */
+  skill: string;
+  level: SkillProficiencyLevel;
+}
+
 export interface JobSearchInput {
   /**
      * @minLength 2
@@ -49,6 +82,17 @@ export interface JobSearchInput {
      * @maxLength 100
      */
   location: string;
+  /**
+     * Alternative accepted locations. Empty cities means all cities in the country. Omit for legacy single-location searches.
+     * @minItems 1
+     * @maxItems 30
+     */
+  locations?: LocationPreference[];
+  /**
+     * User self-assessed proficiency. Does not change the existing skills match scoring.
+     * @maxItems 10
+     */
+  skillLevels?: SkillProficiency[];
   workType: JobSearchInputWorkType;
 }
 

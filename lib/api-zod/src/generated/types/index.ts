@@ -13,3 +13,6 @@ export * from './jobSearchInput';
 export * from './jobSearchInputEducation';
 export * from './jobSearchInputWorkType';
 export * from './jobSearchResponse';
+export * from './locationPreference';
+export * from './skillProficiency';
+export * from './skillProficiencyLevel';
