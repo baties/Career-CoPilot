@@ -1,1 +1,2 @@
 - [Profile and location preferences](profile-and-locations.md) — multiple destinations, editable skill levels, and both LinkedIn import methods are required.
+- [GitHub authorization](github-authorization.md) — reconnecting the GitHub integration does not necessarily repair command-line Git credentials.
