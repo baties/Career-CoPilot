@@ -18,7 +18,7 @@ export interface JobSearchInput {
   title: string;
   /**
      * @minItems 1
-     * @maxItems 10
+     * @maxItems 20
      * @items.minLength 1
      * @items.maxLength 50
      */
@@ -37,7 +37,7 @@ export interface JobSearchInput {
   locations?: LocationPreference[];
   /**
      * User self-assessed proficiency. Does not change the existing skills match scoring.
-     * @maxItems 10
+     * @maxItems 20
      */
   skillLevels?: SkillProficiency[];
   workType: JobSearchInputWorkType;

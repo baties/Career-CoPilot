@@ -10,7 +10,6 @@ export interface LinkedInProfile {
   /** @maxLength 100 */
   name: string;
   /**
-     * @maxItems 1000
      * @items.minLength 1
      * @items.maxLength 50
      */

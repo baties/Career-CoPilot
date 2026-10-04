@@ -4,6 +4,7 @@ import express from "express";
 import type { AddressInfo } from "node:net";
 import { normalizeLinkedInUrl, extractLinkedInProfile } from "./linkedinImport";
 import { createProfilesRouter } from "../routes/profiles";
+import { SearchJobsBody } from "@workspace/api-zod";
 
 test("member URL normalization strips tracking and accepts country hosts", () => {
   assert.equal(normalizeLinkedInUrl("linkedin.com/in/test-member/?trk=share"), "https://www.linkedin.com/in/test-member");
@@ -22,6 +23,22 @@ test("only returns available name and deduplicated skills, never extra person da
   });
   assert.deepEqual(extractLinkedInProfile({ data: {} }), { name: "", skills: [], detectedSkillCount: 0 });
   assert.throws(() => extractLinkedInProfile({}));
+});
+
+test("search contract accepts 20 active skills and rejects 21 or an empty selection", () => {
+  const skills = Array.from({ length: 20 }, (_, i) => `Skill ${i + 1}`);
+  const body = { title: "Developer", skills, education: "bachelors", location: "Worldwide", workType: "any", skillLevels: skills.map((skill) => ({ skill, level: "expert" })) };
+  assert.ok(SearchJobsBody.safeParse(body).success);
+  assert.ok(!SearchJobsBody.safeParse({ ...body, skills: [...skills, "Skill 21"] }).success);
+  assert.ok(!SearchJobsBody.safeParse({ ...body, skills: [] }).success);
+  assert.ok(!SearchJobsBody.safeParse({ ...body, skillLevels: [...body.skillLevels, { skill: "Skill 21", level: "expert" }] }).success);
+});
+
+test("URL extraction preserves all skills and provider order beyond the active limit", () => {
+  const skills = Array.from({ length: 25 }, (_, i) => `Skill ${25 - i}`);
+  const profile = extractLinkedInProfile({ data: { skills } });
+  assert.deepEqual(profile.skills, skills);
+  assert.equal(profile.detectedSkillCount, 25);
 });
 
 async function withApi(proxy: Parameters<typeof createProfilesRouter>[0], run: (post: (body: unknown) => Promise<Response>) => Promise<void>) {

@@ -18,3 +18,7 @@ The user wants simultaneous country/city preferences, such as UAE — Dubai; Can
 Skill proficiency is user-editable across Beginner, Intermediate, Advanced and Expert. Imported levels are not inferred; existing ranking remains unchanged.
 **Why:** Resume skills do not reliably establish proficiency, and the user requested preserving working functionality unrelated to these changes.
 **How to apply:** Keep imported skills editable and ask users to review levels. Do not change scoring based on levels without a separate request.
+
+Retain all extracted skills, but allow at most 20 active for searching. Extracted skills can be activated/deactivated, not deleted; only manually added skills can be deleted.
+**Why:** The user explicitly requested a complete extracted library separate from the active search subset, in a scrollable list. The user accepted “First 20 in the provider’s returned order” when LinkedIn URL data lacks dates.
+**How to apply:** Preserve returned/supplied order, default to the first 20 on an initial import, and never claim unsupported recency or exact LinkedIn order from provider data. Preserve selections and levels on later imports. Search only active skills. Do not discard inactive extracted skills at the cap.

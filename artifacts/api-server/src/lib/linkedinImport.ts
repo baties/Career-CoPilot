@@ -19,7 +19,7 @@ export function extractLinkedInProfile(payload: unknown) {
   const seen = new Set<string>();
   const skills: string[] = [];
   if (Array.isArray(data.skills)) {
-    for (const raw of data.skills.slice(0, 1000)) {
+    for (const raw of data.skills) {
       if (typeof raw !== "string") continue;
       const skill = raw.trim().replace(/\s+/g, " ").slice(0, 50);
       if (!skill || seen.has(skill.toLowerCase())) continue;

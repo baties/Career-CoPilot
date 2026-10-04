@@ -6,7 +6,8 @@ import { importLinkedInProfile } from '@workspace/api-client-react';
 export interface ImportSummary {
   added: number;
   duplicates: number;
-  overLimit: number;
+  activated: number;
+  inactive: number;
   nameSet: boolean;
 }
 
@@ -19,9 +20,9 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 function describe(found: number, s: ImportSummary) {
   if (found === 0 && !s.nameSet) return 'Nothing was confidently detected. You can add skills manually.';
-  const parts = [`Detected ${found} skill${found === 1 ? '' : 's'}; added ${s.added} new`];
+  const parts = [`Extracted ${found} skill${found === 1 ? '' : 's'}; saved ${s.added} new; activated ${s.activated} new`];
   if (s.duplicates) parts.push(`${s.duplicates} already in your list`);
-  if (s.overLimit) parts.push(`${s.overLimit} not added because the 10-skill limit was reached`);
+  if (s.inactive) parts.push(`${s.inactive} inactive extracted skill${s.inactive === 1 ? '' : 's'} available to activate`);
   const name = s.nameSet ? ' Name filled in.' : '';
   return `${parts.join('; ')}.${name} New skills are set to Beginner. Please review their levels below.`;
 }
@@ -41,7 +42,6 @@ export function ResumeParser({ onImport, disabled = false }: ResumeParserProps) 
 
   const finish = (result: ParsedResume) => {
     const summary = onImportRef.current(result);
-    summary.overLimit += result.detectedSkillCount - result.skills.length;
     setMessage(describe(result.detectedSkillCount, summary));
   };
 
@@ -124,7 +124,7 @@ export function ResumeParser({ onImport, disabled = false }: ResumeParserProps) 
         <div>
           <h2 className="font-bold text-foreground">Import your skills</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Use a resume PDF, a LinkedIn profile URL or PDF, or pasted LinkedIn text. Imported skills are merged into your list, up to 10, without replacing your edits.
+            Read all available skills from a resume PDF, a LinkedIn profile URL or PDF, or pasted LinkedIn text. Skills stay in source order; up to 20 are active for searches, and the rest remain available.
           </p>
         </div>
       </div>
@@ -209,7 +209,7 @@ export function ResumeParser({ onImport, disabled = false }: ResumeParserProps) 
             {isParsing && <Loader2 size={18} className="animate-spin" />}
             {isParsing ? 'Looking up profile...' : 'Import from LinkedIn URL'}
           </button>
-          <p className="text-xs text-muted-foreground">Coverage may be incomplete or out of date. Profiles and skills are not guaranteed to be available. Review imported skills and levels below.</p>
+          <p className="text-xs text-muted-foreground">Coverage may be incomplete or out of date. For a first import, the first 20 returned skills start active. The provider does not supply skill dates or guarantee LinkedIn's exact order; we preserve its returned order. Review the active selection and levels below.</p>
         </div>
       )}
 

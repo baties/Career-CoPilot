@@ -8,7 +8,8 @@ import {
   JobSearchInputEducation, 
   JobSearchInputWorkType 
 } from '@workspace/api-client-react';
-import { SkillInput, type SkillLevels } from '../components/SkillInput';
+import { SkillInput } from '../components/SkillInput';
+import { MAX_ACTIVE_SKILLS, mergeExtractedSkills, type CandidateSkill } from '../lib/skillLibrary';
 import { LocationPicker, type LocationSelection } from '../components/LocationPicker';
 import { JobCard } from '../components/JobCard';
 import { ResumeParser } from '../components/ResumeParser';
@@ -19,21 +20,21 @@ import bgImage from '@assets/generated_images/job-finder-background.jpg';
 // Simple validation schema
 const searchSchema = z.object({
   title: z.string().min(2, "Job title must be at least 2 characters").max(100),
-  skills: z.array(z.string()).min(1, "Add at least one skill").max(10, "Maximum 10 skills allowed"),
+  skills: z.array(z.string()).min(1, "Activate at least one skill").max(MAX_ACTIVE_SKILLS, "Maximum 20 active skills allowed"),
   education: z.enum(['high-school', 'diploma', 'bachelors', 'masters', 'doctorate']),
   workType: z.enum(['remote', 'hybrid', 'onsite', 'any']),
 });
 
 export default function Home() {
   const [candidateName, setCandidateName] = useState('');
-  const [formData, setFormData] = useState<JobSearchInput>({
+  const [formData, setFormData] = useState<Omit<JobSearchInput, 'skills' | 'skillLevels'>>({
     title: '',
-    skills: [],
     location: 'Worldwide',
     education: 'bachelors',
     workType: 'any'
   });
-  const [skillLevels, setSkillLevels] = useState<SkillLevels>({});
+  const [skillLibrary, setSkillLibrary] = useState<CandidateSkill[]>([]);
+  const activeSkills = skillLibrary.filter((skill) => skill.active);
   const [worldwide, setWorldwide] = useState(true);
   const [selections, setSelections] = useState<LocationSelection[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -43,7 +44,7 @@ export default function Home() {
   const validateForm = () => {
     const locError = !worldwide && selections.length === 0 ? 'Choose at least one country, or select Worldwide.' : '';
     try {
-      searchSchema.parse(formData);
+      searchSchema.parse({ ...formData, skills: activeSkills.map((skill) => skill.name) });
       setErrors(locError ? { location: locError } : {});
       return !locError;
     } catch (err) {
@@ -74,11 +75,12 @@ export default function Home() {
     searchJobs.mutate({
       data: {
         ...formData,
+        skills: activeSkills.map((skill) => skill.name),
         location: summary,
         ...(worldwide
           ? {}
           : { locations: selections.map((l) => ({ country: l.country, cities: l.cities })) }),
-        skillLevels: formData.skills.map((skill) => ({ skill, level: skillLevels[skill] ?? 'beginner' })),
+        skillLevels: activeSkills.map(({ name, level }) => ({ skill: name, level })),
       },
     });
   };
@@ -129,34 +131,12 @@ export default function Home() {
               <ResumeParser
                 disabled={isSearching}
                 onImport={({ name, skills }) => {
-                  const current = formData.skills;
-                  const seen = new Set(current.map((k) => k.toLowerCase()));
-                  const fresh: string[] = [];
-                  let duplicates = 0;
-                  for (const raw of skills) {
-                    const k = raw.trim().slice(0, 50);
-                    if (!k) continue;
-                    if (seen.has(k.toLowerCase())) {
-                      duplicates += 1;
-                      continue;
-                    }
-                    seen.add(k.toLowerCase());
-                    fresh.push(k);
-                  }
-                  const room = Math.max(0, 10 - current.length);
-                  const added = fresh.slice(0, room);
+                  const merged = mergeExtractedSkills(skillLibrary, skills);
                   const nameSet = !!name && !candidateName.trim();
                   if (nameSet) setCandidateName(name);
-                  if (added.length) {
-                    setFormData((c) => ({ ...c, skills: [...c.skills, ...added] }));
-                    setSkillLevels((c) => {
-                      const next = { ...c };
-                      added.forEach((k) => { next[k] = 'beginner'; });
-                      return next;
-                    });
-                    setErrors((c) => ({ ...c, skills: '' }));
-                  }
-                  return { added: added.length, duplicates, overLimit: fresh.length - added.length, nameSet };
+                  setSkillLibrary(merged.library);
+                  if (merged.library.some((skill) => skill.active)) setErrors((c) => ({ ...c, skills: '' }));
+                  return { ...merged, nameSet };
                 }}
               />
 
@@ -220,19 +200,16 @@ export default function Home() {
                 <div className="space-y-2.5 md:col-span-2">
                   <label className="text-sm font-bold text-foreground/90 flex items-center gap-2">
                     <Sparkles size={18} className="text-primary" />
-                    Core Skills (1-10)
+                    Core Skills (1–20 active)
                   </label>
                   <div className={`${errors.skills ? 'ring-2 ring-destructive/20 rounded-xl' : ''}`}>
                     <SkillInput
-                      skills={formData.skills}
-                      levels={skillLevels}
+                      skills={skillLibrary}
                       disabled={isSearching}
-                      onChange={(skills, levels) => {
-                        setFormData((c) => ({ ...c, skills }));
-                        setSkillLevels(levels);
-                        if (errors.skills && skills.length > 0) setErrors((c) => ({ ...c, skills: '' }));
+                      onChange={(skills) => {
+                        setSkillLibrary(skills);
+                        if (errors.skills && skills.some((skill) => skill.active)) setErrors((c) => ({ ...c, skills: '' }));
                       }}
-                      maxSkills={10}
                     />
                   </div>
                   {errors.skills && <p className="text-sm text-destructive font-semibold">{errors.skills}</p>}
@@ -364,7 +341,7 @@ export default function Home() {
                 <div className="space-y-5">
                   {results.jobs.map((job, idx) => (
                     <div key={job.id} style={{ animationDelay: `${idx * 50}ms` }} className="animate-in fade-in slide-in-from-bottom-4 fill-mode-both">
-                      <JobCard job={job} searchedSkills={formData.skills} />
+                      <JobCard job={job} searchedSkills={searchJobs.variables?.data.skills ?? activeSkills.map((skill) => skill.name)} />
                     </div>
                   ))}
                 </div>

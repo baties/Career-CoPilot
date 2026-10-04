@@ -117,13 +117,18 @@ function extractSkills(text: string) {
   }
 
   const recognizedSkills = SKILL_ALIASES
-    .filter(([, aliases]) =>
-      aliases.some((alias) => {
+    .map(([skill, aliases]) => {
+      let position = Infinity;
+      aliases.forEach((alias) => {
         const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        return new RegExp(`(^|[^a-z0-9+#])${escaped}([^a-z0-9+#]|$)`, 'i').test(normalized);
-      }),
-    )
-    .map(([skill]) => skill);
+        const match = new RegExp(`(^|[^a-z0-9+#])${escaped}([^a-z0-9+#]|$)`, 'i').exec(normalized);
+        if (match) position = Math.min(position, match.index);
+      });
+      return { skill, position };
+    })
+    .filter(({ position }) => Number.isFinite(position))
+    .sort((a, b) => a.position - b.position)
+    .map(({ skill }) => skill);
   const seen = new Set<string>();
   return [...explicitSkills, ...recognizedSkills].filter((skill) => {
     const key = skill.toLowerCase();
@@ -145,7 +150,7 @@ export function parseResumeText(text: string): ParsedResume {
   const skills = extractSkills(text);
   return {
     name: extractLikelyName(text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)),
-    skills: skills.slice(0, 10),
+    skills,
     detectedSkillCount: skills.length,
   };
 }

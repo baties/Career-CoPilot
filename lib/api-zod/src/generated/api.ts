@@ -25,15 +25,13 @@ export const importLinkedInProfileResponseNameMax = 100;
 
 export const importLinkedInProfileResponseSkillsItemMax = 50;
 
-export const importLinkedInProfileResponseSkillsMax = 1000;
-
 export const importLinkedInProfileResponseDetectedSkillCountMin = 0;
 
 
 
 export const ImportLinkedInProfileResponse = zod.object({
   "name": zod.string().max(importLinkedInProfileResponseNameMax),
-  "skills": zod.array(zod.string().min(1).max(importLinkedInProfileResponseSkillsItemMax)).max(importLinkedInProfileResponseSkillsMax),
+  "skills": zod.array(zod.string().min(1).max(importLinkedInProfileResponseSkillsItemMax)),
   "detectedSkillCount": zod.number().int().min(importLinkedInProfileResponseDetectedSkillCountMin)
 })
 
@@ -56,7 +54,7 @@ export const searchJobsBodyTitleMax = 100;
 
 export const searchJobsBodySkillsItemMax = 50;
 
-export const searchJobsBodySkillsMax = 10;
+export const searchJobsBodySkillsMax = 20;
 
 export const searchJobsBodyLocationMin = 2;
 export const searchJobsBodyLocationMax = 100;
@@ -73,7 +71,7 @@ export const searchJobsBodyLocationsMax = 30;
 
 export const searchJobsBodySkillLevelsItemSkillMax = 50;
 
-export const searchJobsBodySkillLevelsMax = 10;
+export const searchJobsBodySkillLevelsMax = 20;
 
 
 

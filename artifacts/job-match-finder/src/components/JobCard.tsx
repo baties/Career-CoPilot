@@ -78,7 +78,7 @@ export function JobCard({ job, searchedSkills }: JobCardProps) {
         <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start gap-5 shrink-0">
           <div className={`flex flex-col items-center justify-center w-20 h-20 rounded-2xl border-2 ${scoreClasses.split(' ').slice(1).join(' ')} shadow-sm`}>
             <span className={`text-2xl font-black ${scoreClasses.split(' ')[0]}`}>
-              {job.score}
+              {job.score}%
             </span>
             <span className={`text-[10px] font-bold uppercase tracking-widest ${scoreClasses.split(' ')[0]} opacity-80 mt-0.5`}>
               Match
