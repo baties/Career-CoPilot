@@ -216,7 +216,7 @@ export function ResumeParser({ onImport, disabled = false }: ResumeParserProps) 
       <div className="flex items-start gap-2 rounded-xl border border-border/60 bg-background/50 px-4 py-3 text-sm text-muted-foreground" role="note">
         <Info size={16} className="mt-0.5 shrink-0 text-primary" />
         <p>
-          PDFs and pasted text stay in this browser. URL imports use People Data Labs through our server; the app does not save the profile URL or returned profile to a database.
+          Original PDFs and pasted text are not saved or uploaded. Imported names, skills and your preferences are saved in this browser on this device. URL imports use People Data Labs through our server; the app does not save the profile URL or provider response to a database.
         </p>
       </div>
 

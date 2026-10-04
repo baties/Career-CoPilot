@@ -22,3 +22,7 @@ Skill proficiency is user-editable across Beginner, Intermediate, Advanced and E
 Retain all extracted skills, but allow at most 20 active for searching. Extracted skills can be activated/deactivated, not deleted; only manually added skills can be deleted.
 **Why:** The user explicitly requested a complete extracted library separate from the active search subset, in a scrollable list. The user accepted “First 20 in the provider’s returned order” when LinkedIn URL data lacks dates.
 **How to apply:** Preserve returned/supplied order, default to the first 20 on an initial import, and never claim unsupported recency or exact LinkedIn order from provider data. Preserve selections and levels on later imports. Search only active skills. Do not discard inactive extracted skills at the cap.
+
+User profile details must survive website refreshes without requiring a major database or paid storage solution.
+**Why:** The user said “It must save the user data somewhere” and “It's not good whenever a user refresh the website all the data will be gone,” accepting lightweight/free options.
+**How to apply:** Browser-local persistence is sufficient for same-device refresh/reopen continuity; be explicit that it is not cross-device synchronization. Save profile fields and the complete skill library, not raw resumes, provider responses or consent. Protect unreadable saved data from automatic overwriting and require confirmation before clearing it.

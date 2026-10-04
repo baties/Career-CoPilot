@@ -71,9 +71,11 @@ Try one or more of the following:
 
 - No account is required.
 - The app does not save searches in a database.
-- Resume PDFs and pasted profile text are parsed locally in the browser and are not uploaded or saved. The editable name is not sent in job searches.
+- Your name, complete skill library (including source, active selections and levels), target role, selected countries/cities, education and work preference are saved automatically using free browser local storage. They are restored after refreshes and browser restarts on the same site, browser and device; they do not sync across devices.
+- Clearing browser/site data or ending a private-browsing session may remove saved details. Use **Clear saved profile** on shared devices; confirmation is required before your saved profile and current form are reset. Storage failures are shown explicitly. Invalid or unsupported saved data is not silently overwritten.
+- Resume PDFs and pasted profile text are parsed locally in the browser and are not uploaded or saved. Only the extracted name and skill library are saved locally. The editable name is not sent in job searches.
 - LinkedIn URL imports send the profile URL to People Data Labs via the server only after agreement. The app does not log the URL or returned profile, or save them in a database; only available name and skills are returned to the browser.
-- Search details are used only to retrieve, filter, and rank the current results.
+- Search requests still contain only active skills and selected search preferences. Job results are not saved or automatically re-fetched on refresh; click **Search Jobs** to fetch current openings using the restored profile.
 - If the public job provider is temporarily unavailable, the app may show clearly labeled demo search results so the experience can still be demonstrated.
 
 ## Run locally

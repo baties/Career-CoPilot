@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { useSearchJobs } from '@workspace/api-client-react';
-import type { 
-  JobSearchInput, 
-  JobSearchResponse 
-} from '@workspace/api-client-react';
 import { 
   JobSearchInputEducation, 
   JobSearchInputWorkType 
 } from '@workspace/api-client-react';
 import { SkillInput } from '../components/SkillInput';
 import { MAX_ACTIVE_SKILLS, mergeExtractedSkills, type CandidateSkill } from '../lib/skillLibrary';
+import { useSavedProfile } from '../hooks/useSavedProfile';
+import type { SavedProfile } from '../lib/profileStorage';
 import { LocationPicker, type LocationSelection } from '../components/LocationPicker';
 import { JobCard } from '../components/JobCard';
 import { ResumeParser } from '../components/ResumeParser';
@@ -26,17 +24,14 @@ const searchSchema = z.object({
 });
 
 export default function Home() {
-  const [candidateName, setCandidateName] = useState('');
-  const [formData, setFormData] = useState<Omit<JobSearchInput, 'skills' | 'skillLevels'>>({
-    title: '',
-    location: 'Worldwide',
-    education: 'bachelors',
-    workType: 'any'
-  });
-  const [skillLibrary, setSkillLibrary] = useState<CandidateSkill[]>([]);
+  const { profile, storageStatus, storageBlocked, updateField, clearSavedProfile, retrySaving } = useSavedProfile();
+  const { candidateName, formData, skillLibrary, worldwide, selections } = profile;
+  const setCandidateName = (value: string) => updateField('candidateName', value);
+  const setFormData = (value: React.SetStateAction<SavedProfile['formData']>) => updateField('formData', value);
+  const setSkillLibrary = (value: CandidateSkill[]) => updateField('skillLibrary', value);
+  const setWorldwide = (value: boolean) => updateField('worldwide', value);
+  const setSelections = (value: LocationSelection[]) => updateField('selections', value);
   const activeSkills = skillLibrary.filter((skill) => skill.active);
-  const [worldwide, setWorldwide] = useState(true);
-  const [selections, setSelections] = useState<LocationSelection[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
   const searchJobs = useSearchJobs();
@@ -128,6 +123,34 @@ export default function Home() {
           {/* Search Form */}
           <div className="glass-card rounded-[2rem] p-6 md:p-10 animate-in fade-in slide-in-from-bottom-5 delay-150">
             <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between rounded-xl border border-border/60 bg-background/60 p-4">
+                <div className="min-w-0 space-y-1 text-sm">
+                  <p data-testid="profile-storage-status" role={storageStatus.kind === 'error' ? 'alert' : 'status'} className={storageStatus.kind === 'error' ? 'font-semibold text-destructive' : 'font-semibold text-foreground'}>
+                    {storageStatus.message}
+                  </p>
+                  <p className="text-muted-foreground">
+                    Name, skills and preferences are saved automatically in this browser. They survive refreshes and browser restarts, but do not sync to other devices. Clearing browser data removes them. Clear your profile when using a shared device.
+                  </p>
+                  {storageStatus.kind === 'error' && (
+                    <button type="button" onClick={retrySaving} data-testid="button-retry-profile-save" className="font-semibold text-primary underline focus:outline-none focus:ring-2 focus:ring-primary/50 rounded">
+                      {storageBlocked ? 'Reload to retry' : 'Retry saving'}
+                    </button>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  disabled={isSearching}
+                  data-testid="button-clear-profile"
+                  className="shrink-0 rounded-lg border border-border/60 px-3 py-2 text-sm font-semibold hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
+                  onClick={() => {
+                    if (!window.confirm('Clear your saved profile and all current details? This removes your name, every extracted and manually added skill, proficiency levels, and search preferences from this browser. This cannot be undone.')) return;
+                    // Reload also discards drafts and cancels pending client-side imports.
+                    if (clearSavedProfile()) window.location.reload();
+                  }}
+                >
+                  Clear saved profile
+                </button>
+              </div>
               <ResumeParser
                 disabled={isSearching}
                 onImport={({ name, skills }) => {
@@ -151,6 +174,7 @@ export default function Home() {
                     id="candidate-name"
                     type="text"
                     placeholder="Imported from your resume"
+                    maxLength={100}
                     className="w-full px-5 py-3.5 rounded-xl border border-border/60 bg-background/60 backdrop-blur-md text-foreground font-medium placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm hover:border-primary/30"
                     value={candidateName}
                     onChange={(event) => setCandidateName(event.target.value)}
@@ -168,6 +192,7 @@ export default function Home() {
                   <input
                     type="text"
                     placeholder="e.g. Senior Frontend Engineer"
+                    maxLength={100}
                     className={`w-full px-5 py-3.5 rounded-xl border bg-background/60 backdrop-blur-md text-foreground font-medium placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all shadow-sm hover:border-primary/30 ${errors.title ? 'border-destructive ring-destructive/20' : 'border-border/60'}`}
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
