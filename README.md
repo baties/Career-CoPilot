@@ -47,6 +47,8 @@ For URL import, select **LinkedIn URL**, enter your `https://www.linkedin.com/in
 
 The provider does not return per-skill dates or guarantee the exact LinkedIn display order. The app preserves its returned order and defaults to the first 20 on an initial import, rather than claiming they are dated “most recent” skills. PDF/text imports retain the supplied skills-section order. Only active skills and their levels are sent in job searches; inactive entries are never included in matching or ranking.
 
+PDF imports identify a prominent first-page name separately from sidebar skills, recognize LinkedIn **Top Skills** and summary **Core areas** lists, and handle wrapped names, bullets and programming-tool lists. They also collect supported technology names from the work narrative, without turning course titles, language proficiency or generic prose into skills. Extraction is local and deterministic, not an AI assessment of proficiency. If a name is uncertain it stays blank; if a previously saved name matches a detected skill, replacement requires confirmation. Existing saved skills and user edits are preserved: unchecked older incorrect entries are excluded from searches. Scanned/image-only PDFs still require a text-based export.
+
 To limit anonymous lookup costs, the server allows five attempts per network address per hour, 30 attempts per day, and two simultaneous provider calls, per running server process. These in-memory limits reset on restart and are not an account-wide billing cap across multiple instances. Set provider-side spending limits for a firm account-wide budget. No automatic app retries or profile caching are used. A timed-out lookup may still consume a credit if the provider eventually matches it.
 
 ## Tips for better matches

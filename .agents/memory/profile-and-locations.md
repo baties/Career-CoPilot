@@ -26,3 +26,7 @@ Retain all extracted skills, but allow at most 20 active for searching. Extracte
 User profile details must survive website refreshes without requiring a major database or paid storage solution.
 **Why:** The user said “It must save the user data somewhere” and “It's not good whenever a user refresh the website all the data will be gone,” accepting lightweight/free options.
 **How to apply:** Browser-local persistence is sufficient for same-device refresh/reopen continuity; be explicit that it is not cross-device synchronization. Save profile fields and the complete skill library, not raw resumes, provider responses or consent. Protect unreadable saved data from automatic overwriting and require confirmation before clearing it.
+
+LinkedIn profile PDFs can contain only a short “Top Skills” list, rather than the complete LinkedIn Skills section.
+**Why:** The uploaded export used to diagnose parser errors listed three sidebar skills, while its summary and experience described many additional technologies.
+**How to apply:** Describe PDF results as document-supported skill extraction, not a complete or verified copy of LinkedIn skills. Preserve explicit list order and require review of technology mentions inferred from the narrative. An uncertain name should remain blank, not be guessed from a sidebar.

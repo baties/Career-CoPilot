@@ -155,7 +155,11 @@ export default function Home() {
                 disabled={isSearching}
                 onImport={({ name, skills }) => {
                   const merged = mergeExtractedSkills(skillLibrary, skills);
-                  const nameSet = !!name && !candidateName.trim();
+                  const looksLikeOldSkillName = [...skills, ...skillLibrary.map((skill) => skill.name)]
+                    .some((skill) => skill.trim().toLowerCase() === candidateName.trim().toLowerCase());
+                  const nameSet = !!name && (!candidateName.trim() ||
+                    (name !== candidateName && looksLikeOldSkillName &&
+                      window.confirm(`Your current name "${candidateName}" matches a skill. Replace it with the detected name "${name}"?`)));
                   if (nameSet) setCandidateName(name);
                   setSkillLibrary(merged.library);
                   if (merged.library.some((skill) => skill.active)) setErrors((c) => ({ ...c, skills: '' }));

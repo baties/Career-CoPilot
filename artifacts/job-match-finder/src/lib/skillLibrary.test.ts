@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { addManualSkill, mergeExtractedSkills, removeManualSkill, setSkillActive } from './skillLibrary';
-import { parseResumeText } from './resumeParser';
+import { parseResumeText } from './resumeText';
 
 const names = Array.from({ length: 25 }, (_, index) => `Skill ${index + 1}`);
 

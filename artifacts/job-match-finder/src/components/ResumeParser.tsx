@@ -42,7 +42,7 @@ export function ResumeParser({ onImport, disabled = false }: ResumeParserProps) 
 
   const finish = (result: ParsedResume) => {
     const summary = onImportRef.current(result);
-    setMessage(describe(result.detectedSkillCount, summary));
+    setMessage(`${describe(result.detectedSkillCount, summary)}${!result.name ? ' No name was confidently identified; enter it manually rather than using a guessed skill or title.' : ''}`);
   };
 
   const handleFile = async (file?: File) => {
